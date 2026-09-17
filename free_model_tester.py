@@ -60,6 +60,12 @@ _WEB_URL = None
 MODELS_CACHE = "models_cache.json"
 MODELS_CACHE_TTL = 3600  # seconds
 
+# OpenRouter free-models-per-day = 200 (1000 with 10 credits). 19 models * 720/day = 13k > limit.
+# Keep 19, test random 5 every 2.4h (8640s = 72 rounds @120s) => ~50/day <200.
+OPENROUTER_SAMPLE_SIZE = int(os.environ.get("OPENROUTER_SAMPLE", "5"))
+OPENROUTER_EVERY_SEC = int(os.environ.get("OPENROUTER_EVERY_SEC", "8640"))
+_last_openrouter_test = 0  # epoch seconds of last sampled openrouter sweep
+
 DISCOVERY = {
     "nvidia":     {"url": "https://integrate.api.nvidia.com/v1/models"},
     "groq":       {"url": "https://api.groq.com/openai/v1/models"},
@@ -814,6 +820,29 @@ async def test_all(provider_keys=None, concurrency=DEFAULT_CONCURRENCY,
         chosen = {k: v for k, v in PROVIDERS.items() if k != "cohere"}
     else:
         chosen = {k: v for k, v in PROVIDERS.items() if not provider_keys or k in provider_keys}
+    global _last_openrouter_test
+    # OpenRouter: keep 19, sample 5 every 2.4h to stay <200/day. Explicit --providers openrouter bypasses sampling.
+    openrouter_sampling = (
+        provider_keys is None
+        and "openrouter" in chosen
+        and os.environ.get("OPENROUTER_ENABLED", "").lower() not in ("1", "true", "yes")
+    )
+    if openrouter_sampling:
+        now = time.time()
+        if now - _last_openrouter_test < OPENROUTER_EVERY_SEC:
+            # skip this round — save 200/day quota
+            chosen = {k: v for k, v in chosen.items() if k != "openrouter"}
+        else:
+            _last_openrouter_test = now
+            # keep 19 stored, but test only 5 random
+            import random as _rnd
+            pool = chosen["openrouter"]["models"]
+            sampled = _rnd.sample(pool, min(OPENROUTER_SAMPLE_SIZE, len(pool)))
+            chosen = dict(chosen)
+            chosen["openrouter"] = dict(chosen["openrouter"])
+            chosen["openrouter"]["models"] = sampled
+            console.print(f"[dim]OpenRouter sample: {', '.join(m[0] for m in sampled)}[/dim]")
+
     global_sem = asyncio.Semaphore(concurrency)
     connector = aiohttp.TCPConnector(limit=concurrency, ssl=True)
     tasks = []
