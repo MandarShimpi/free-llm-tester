@@ -808,7 +808,12 @@ async def ping_model(session, provider_key, provider_info, model, global_sem, pr
 
 async def test_all(provider_keys=None, concurrency=DEFAULT_CONCURRENCY,
                    timeout_s=DEFAULT_TIMEOUT, jitter=True, deep=False):
-    chosen = {k: v for k, v in PROVIDERS.items() if not provider_keys or k in provider_keys}
+    # Cohere trial is 1000 calls/month — 9 models * 720 rounds/day = 6480/day burns it in hours.
+    # Skip cohere on default full sweeps; test explicitly with --providers cohere
+    if provider_keys is None and os.environ.get("COHERE_ENABLED", "").lower() not in ("1", "true", "yes"):
+        chosen = {k: v for k, v in PROVIDERS.items() if k != "cohere"}
+    else:
+        chosen = {k: v for k, v in PROVIDERS.items() if not provider_keys or k in provider_keys}
     global_sem = asyncio.Semaphore(concurrency)
     connector = aiohttp.TCPConnector(limit=concurrency, ssl=True)
     tasks = []
