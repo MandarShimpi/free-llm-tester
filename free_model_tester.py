@@ -51,7 +51,7 @@ console = Console()
 DEFAULT_INTERVAL = int(os.environ.get("FREE_MODEL_TESTER_INTERVAL", "120"))
 DEFAULT_TIMEOUT = 15
 DEFAULT_CONCURRENCY = 40
-DEFAULT_PROVIDER_CONCURRENCY = 8  # cap when rpm is unknown
+DEFAULT_PROVIDER_CONCURRENCY = 4  # cap when rpm is unknown (kilo/llm7 etc) — was 8, too bursty
 DEFAULT_PORT = int(os.environ.get("FREE_MODEL_TESTER_PORT", "8765"))
 WEB_DIR = Path(__file__).resolve().parent / "web"
 _RESULTS_PREFIX = os.environ.get("FREE_MODEL_TESTER_OUTPUT", "results")
@@ -449,7 +449,7 @@ PROVIDERS = {
     "openrouter": {
         "name": "OpenRouter",
         "url": "https://openrouter.ai/api/v1/chat/completions",
-        "rpm": "20",
+        "rpm": "5",
         "extra_headers": {"HTTP-Referer": "https://github.com/local/free-model-tester", "X-Title": "free-model-tester"},
         "models": [
             ("nvidia/nemotron-3-ultra-550b-a55b:free", "Nemotron 3 Ultra", "S+", "1M"),
@@ -501,7 +501,7 @@ PROVIDERS = {
     "kilo": {
         "name": "Kilo",
         "url": "https://api.kilo.ai/api/gateway/chat/completions",
-        "rpm": "--",
+        "rpm": "3",
         "no_key": True,
         "models": [
             ("kilo-auto/free", "Kilo Auto Free", "A+", "256k"),
@@ -519,7 +519,7 @@ PROVIDERS = {
     "llm7": {
         "name": "LLM7",
         "url": "https://api.llm7.io/v1/chat/completions",
-        "rpm": "--",
+        "rpm": "3",
         "no_key": True,
         "models": [
             ("minimax-m2.7", "MiniMax M2.7", "S+", "180k"),
