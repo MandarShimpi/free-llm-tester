@@ -583,7 +583,7 @@ PROVIDERS = {
     "cohere": {
         "name": "Cohere",
         "url": "https://api.cohere.com/compatibility/v1/chat/completions",
-        "rpm": "20",
+        "rpm": "2",
         "models": [
             ("command-r-plus-08-2024", "Command R+", "A", "128k"),
             ("command-r-08-2024", "Command R", "B+", "128k"),
