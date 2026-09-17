@@ -659,8 +659,9 @@ function hideBanner(){ $('fallbackBar').style.display = 'none'; }
  $('fallbackClose').addEventListener('click', hideBanner);
 
 /* ---------- data loading ---------- */
+const API_BASE = (window.__API_BASE__ || 'https://free-llm-tester.onrender.com').replace(/\/$/,'');
 async function load(){
-  const paths = ['../results.json','../data/results.json','./data/results.json','./results.json','results.json'];
+  const paths = [`${API_BASE}/results.json`,`${API_BASE}/data/results.json`,'../results.json','../data/results.json','./data/results.json','./results.json','results.json'];
   let loaded = null;
   for(const p of paths){
     try{
