@@ -449,7 +449,7 @@ PROVIDERS = {
     "openrouter": {
         "name": "OpenRouter",
         "url": "https://openrouter.ai/api/v1/chat/completions",
-        "rpm": "5",
+        "rpm": "2",
         "extra_headers": {"HTTP-Referer": "https://github.com/local/free-model-tester", "X-Title": "free-model-tester"},
         "models": [
             ("nvidia/nemotron-3-ultra-550b-a55b:free", "Nemotron 3 Ultra", "S+", "1M"),
@@ -501,7 +501,7 @@ PROVIDERS = {
     "kilo": {
         "name": "Kilo",
         "url": "https://api.kilo.ai/api/gateway/chat/completions",
-        "rpm": "3",
+        "rpm": "2",
         "no_key": True,
         "models": [
             ("kilo-auto/free", "Kilo Auto Free", "A+", "256k"),
@@ -519,7 +519,7 @@ PROVIDERS = {
     "llm7": {
         "name": "LLM7",
         "url": "https://api.llm7.io/v1/chat/completions",
-        "rpm": "3",
+        "rpm": "2",
         "no_key": True,
         "models": [
             ("minimax-m2.7", "MiniMax M2.7", "S+", "180k"),
